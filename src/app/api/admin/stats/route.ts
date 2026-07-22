@@ -26,11 +26,11 @@ export async function GET() {
         { month: string; count: number }[]
       >(`
         SELECT
-          strftime('%Y-%m', createdAt) as month,
+          to_char("createdAt", 'YYYY-MM') as month,
           COUNT(*) as count
         FROM "Order"
-        WHERE createdAt >= datetime('now', '-6 months')
-        GROUP BY strftime('%Y-%m', createdAt)
+        WHERE "createdAt" >= NOW() - INTERVAL '6 months'
+        GROUP BY to_char("createdAt", 'YYYY-MM')
         ORDER BY month ASC
       `),
     ]);
@@ -48,3 +48,4 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 });
   }
 }
+
