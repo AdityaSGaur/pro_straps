@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon, ArrowLeft2Icon, ArrowRight2Icon } from '@/lib/icons'
 import { ProductCard } from './product-card'
+import { cn } from '@/lib/utils'
 
 type ProductWithDetails = {
   id: string
@@ -120,23 +121,35 @@ export function ProductGrid({
         </motion.div>
       )}
 
-      {/* Horizontal scroll carousel */}
-      <div
-        ref={scrollRef}
-        className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4 sm:mx-0 sm:px-0"
-      >
-        {products.map((product, i) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.5, delay: Math.min(i, 3) * 0.07 }}
-            className="w-[220px] sm:w-[240px] lg:w-[260px] shrink-0"
-          >
-            <ProductCard product={product} />
-          </motion.div>
-        ))}
+      {/* Horizontal scroll carousel with gradient edge masks */}
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        >
+          {products.map((product, i) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: Math.min(i, 3) * 0.07 }}
+              className="w-[220px] sm:w-[240px] lg:w-[260px] shrink-0"
+            >
+              <ProductCard product={product} />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Left fade gradient overlay */}
+        {canScrollLeft && (
+          <div className="absolute left-0 top-0 bottom-2 w-12 sm:w-20 bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none z-10" />
+        )}
+
+        {/* Right fade gradient overlay */}
+        {canScrollRight && (
+          <div className="absolute right-0 top-0 bottom-2 w-12 sm:w-20 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none z-10" />
+        )}
       </div>
     </section>
   )
