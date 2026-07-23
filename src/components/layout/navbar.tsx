@@ -42,7 +42,7 @@ const SHOP_CATEGORIES = [
 
 function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/" className={cn("inline-flex items-center", className)}>
+    <Link href="/" className={cn("inline-flex items-center justify-center shrink-0", className)}>
       <Image
         src="/docs/planning/brand/logo_light.png"
         alt="Pro Straps Logo"
@@ -419,12 +419,12 @@ export function Navbar() {
             </button>
 
             {/* ---- Desktop: logo ---- */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:flex items-center">
               <Logo />
             </div>
 
             {/* ---- Mobile: centered logo ---- */}
-            <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
               <Logo className="scale-90" />
             </div>
 
