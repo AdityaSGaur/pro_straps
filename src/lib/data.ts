@@ -195,7 +195,7 @@ export const getProducts = cache(async function getProducts(params?: {
   ]);
 
   return { products: products as ProductWithDetails[], total };
-}
+});
 
 // ─── Get a single product by slug with reviews and avg rating ──────────
 
