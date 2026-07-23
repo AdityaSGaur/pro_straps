@@ -143,9 +143,9 @@ export function ProductGrid({
         {/* Left fade gradient overlay */}
         {canScrollLeft && (
           <div 
-            className="absolute left-0 top-0 bottom-2 w-12 sm:w-20 pointer-events-none z-10"
+            className="absolute left-0 top-0 bottom-2 w-20 sm:w-32 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(to right, var(--background) 0%, transparent 100%)'
+              background: 'linear-gradient(to right, var(--background) 0%, var(--background) 30%, transparent 100%)'
             }}
           />
         )}
@@ -153,9 +153,9 @@ export function ProductGrid({
         {/* Right fade gradient overlay */}
         {canScrollRight && (
           <div 
-            className="absolute right-0 top-0 bottom-2 w-12 sm:w-20 pointer-events-none z-10"
+            className="absolute right-0 top-0 bottom-2 w-20 sm:w-32 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(to left, var(--background) 0%, transparent 100%)'
+              background: 'linear-gradient(to left, var(--background) 0%, var(--background) 30%, transparent 100%)'
             }}
           />
         )}
