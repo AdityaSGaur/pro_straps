@@ -78,7 +78,7 @@ export function SearchDialog() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="search for straps, materials, brands..."
-              className="border-0 shadow-none text-xl focus-visible:ring-0 px-1 h-12 py-3 placeholder:text-muted-foreground/60 text-foreground w-full bg-transparent"
+              className="border-0 shadow-none text-xl focus-visible:ring-0 px-1 h-12 py-3 placeholder:text-muted-foreground/60 text-foreground w-full bg-transparent dark:bg-transparent"
             />
             {query && (
               <button onClick={() => setQuery("")} className="p-1">
