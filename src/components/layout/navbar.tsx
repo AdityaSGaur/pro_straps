@@ -288,12 +288,34 @@ function MobileQuickAction({ icon, label, count, onClick, href, onClose }: {
   href?: string;
   onClose?: () => void;
 }) {
+  const { data: session } = useSession();
+
   const iconEl = (
-    <span className="relative">
+    <span className="relative flex items-center justify-center">
       {icon === "search" && <SearchIcon size={20} className="text-[#0A0A0A] dark:text-white" />}
       {icon === "wishlist" && <HeartIcon size={20} className="text-[#0A0A0A] dark:text-white" />}
       {icon === "cart" && <ShoppingBagIcon size={20} className="text-[#0A0A0A] dark:text-white" />}
-      {icon === "account" && <UserIcon size={20} className="text-[#0A0A0A] dark:text-white" />}
+      {icon === "account" && (
+        session?.user ? (
+          session.user.image ? (
+            <div className="size-6 rounded-full overflow-hidden border border-border">
+              <Image
+                src={session.user.image}
+                alt={session.user.name || "User Avatar"}
+                width={24}
+                height={24}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="size-6 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-[10px] font-bold border border-border uppercase">
+              {(session.user.name || session.user.email || "U")[0]}
+            </div>
+          )
+        ) : (
+          <UserIcon size={20} className="text-[#0A0A0A] dark:text-white" />
+        )
+      )}
       {count !== undefined && count > 0 && (
         <span className="absolute -top-1.5 -right-2 size-4 flex items-center justify-center bg-[#CCFF00] text-[#0A0A0A] text-[10px] font-bold rounded-full min-w-4">
           {count > 99 ? "99+" : count}
@@ -491,12 +513,32 @@ export function Navbar() {
 
               {/* Account button */}
               <div className="hidden lg:block relative">
-                <button
-                  className="flex p-2 rounded-full hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors"
+                 <button
+                  className="flex items-center justify-center rounded-full hover:opacity-85 transition-opacity"
                   aria-label="Account"
                   onClick={() => setAccountOpen(!accountOpen)}
                 >
-                  <UserIcon size={18} className="text-[#0A0A0A] dark:text-white" />
+                  {session?.user ? (
+                    session.user.image ? (
+                      <div className="size-8 rounded-full overflow-hidden border border-border">
+                        <Image
+                          src={session.user.image}
+                          alt={session.user.name || "User Avatar"}
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="size-8 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-sm font-bold border border-border uppercase">
+                        {(session.user.name || session.user.email || "U")[0]}
+                      </div>
+                    )
+                  ) : (
+                    <div className="p-2 rounded-full hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors">
+                      <UserIcon size={18} className="text-[#0A0A0A] dark:text-white" />
+                    </div>
+                  )}
                 </button>
 
                 {accountOpen && (
