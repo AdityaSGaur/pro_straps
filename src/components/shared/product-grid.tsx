@@ -120,12 +120,11 @@ export function ProductGrid({
           </div>
         </motion.div>
       )}
-
-      {/* Horizontal scroll carousel with gradient edge masks */}
+      {/* Horizontal scroll carousel */}
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
         >
           {products.map((product, i) => (
             <motion.div
@@ -140,16 +139,6 @@ export function ProductGrid({
             </motion.div>
           ))}
         </div>
-
-        {/* Left fade gradient overlay */}
-        {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-2 w-8 sm:w-12 bg-gradient-to-r from-white via-white/70 to-transparent dark:from-[#0A0A0A] dark:via-[#0A0A0A]/70 pointer-events-none z-10" />
-        )}
-
-        {/* Right fade gradient overlay */}
-        {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-2 w-8 sm:w-12 bg-gradient-to-l from-white via-white/70 to-transparent dark:from-[#0A0A0A] dark:via-[#0A0A0A]/70 pointer-events-none z-10" />
-        )}
       </div>
     </section>
   )
