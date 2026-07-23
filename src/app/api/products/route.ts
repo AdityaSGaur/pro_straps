@@ -1,31 +1,42 @@
-import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { getProducts } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status");
+    const category = searchParams.get("category") || undefined;
+    const collection = searchParams.get("collection") || undefined;
+    const sort = searchParams.get("sort") || "newest";
+    const q = searchParams.get("q") || undefined;
+    const strapType = searchParams.get("strapType") || undefined;
+    const priceMinVal = searchParams.get("priceMin");
+    const priceMaxVal = searchParams.get("priceMax");
+    const inStockVal = searchParams.get("inStock");
+    const pageVal = searchParams.get("page");
+    const limitVal = searchParams.get("limit");
 
-    const where: Record<string, unknown> = {};
-    if (status) {
-      where.status = status;
-    }
+    const priceMin = priceMinVal ? parseInt(priceMinVal, 10) : undefined;
+    const priceMax = priceMaxVal ? parseInt(priceMaxVal, 10) : undefined;
+    const inStock = inStockVal === "true";
+    const page = pageVal ? parseInt(pageVal, 10) : 1;
+    const limit = limitVal ? parseInt(limitVal, 10) : 12;
 
-    const products = await db.product.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        basePrice: true,
-        strapType: true,
-      },
-      orderBy: { createdAt: "desc" },
+    const data = await getProducts({
+      category,
+      collection,
+      sort,
+      search: q,
+      strapType,
+      priceMin,
+      priceMax,
+      inStock: inStock || undefined,
+      page,
+      limit,
     });
 
-    return NextResponse.json(products);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Failed to fetch products:", error);
+    console.error("Failed to fetch products API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch products" },
       { status: 500 }

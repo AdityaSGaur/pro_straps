@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 
 import { getProducts, getCategories, getCollections } from '@/lib/data'
-import { ProductCard } from '@/components/shared/product-card'
+import { InfiniteProductGrid } from '@/components/shared/infinite-product-grid'
 import {
   ShopFilters,
   SortSelector,
@@ -90,7 +90,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   ])
 
   const { products, total } = productsData
-  const totalPages = Math.ceil(total / PRODUCTS_PER_PAGE)
   const searchParamsObj = new URLSearchParams()
 
   if (category) searchParamsObj.set('category', category)
@@ -168,99 +167,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       {/* ── Full Width Ultra-Clean Product Grid ── */}
       <main className="w-full">
         {products.length > 0 ? (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <nav
-                className="mt-14 flex items-center justify-center gap-1.5"
-                aria-label="Pagination"
-              >
-                {page > 1 ? (
-                  <Link
-                    href={buildQueryString(searchParamsObj, {
-                      page: String(page - 1),
-                    })}
-                    className="inline-flex items-center justify-center size-10 rounded-full text-sm font-medium border border-border/60 text-foreground hover:bg-muted transition-colors"
-                  >
-                    &larr;
-                  </Link>
-                ) : (
-                  <span className="inline-flex items-center justify-center size-10 rounded-full text-sm font-medium border border-border/30 text-muted-foreground/40 cursor-not-allowed">
-                    &larr;
-                  </span>
-                )}
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-                  const show =
-                    p === 1 ||
-                    p === totalPages ||
-                    (p >= page - 1 && p <= page + 1)
-
-                  if (!show) {
-                    if (p === 2 && page > 3) {
-                      return (
-                        <span
-                          key={p}
-                          className="size-10 flex items-center justify-center text-xs text-muted-foreground"
-                        >
-                          ...
-                        </span>
-                      )
-                    }
-                    if (p === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <span
-                          key={p}
-                          className="size-10 flex items-center justify-center text-xs text-muted-foreground"
-                        >
-                          ...
-                        </span>
-                      )
-                    }
-                    return null
-                  }
-
-                  return (
-                    <Link
-                      key={p}
-                      href={buildQueryString(searchParamsObj, {
-                        page: String(p),
-                      })}
-                      className={cn(
-                        'inline-flex items-center justify-center size-10 rounded-full text-sm font-bold transition-all',
-                        p === page
-                          ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
-                          : 'border border-border/60 text-foreground hover:bg-muted'
-                      )}
-                    >
-                      {p}
-                    </Link>
-                  )
-                })}
-
-                {page < totalPages ? (
-                  <Link
-                    href={buildQueryString(searchParamsObj, {
-                      page: String(page + 1),
-                    })}
-                    className="inline-flex items-center justify-center size-10 rounded-full text-sm font-medium border border-border/60 text-foreground hover:bg-muted transition-colors"
-                  >
-                    &rarr;
-                  </Link>
-                ) : (
-                  <span className="inline-flex items-center justify-center size-10 rounded-full text-sm font-medium border border-border/30 text-muted-foreground/40 cursor-not-allowed">
-                    &rarr;
-                  </span>
-                )}
-              </nav>
-            )}
-          </>
+          <InfiniteProductGrid
+            initialProducts={products}
+            total={total}
+            limit={PRODUCTS_PER_PAGE}
+            activeFilters={activeFilters}
+            sort={sort}
+          />
         ) : (
           <div className="text-center py-20 bg-[#f7f7f9] dark:bg-neutral-900/60 rounded-3xl border border-border/40">
             <h3 className="text-lg font-bold text-foreground lowercase">
