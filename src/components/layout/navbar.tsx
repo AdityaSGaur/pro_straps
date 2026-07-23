@@ -240,6 +240,15 @@ function MobileNavContent({ onClose, session, wishlistCount, cartCount }: {
                 {session.user.email}
               </p>
             </div>
+            <Link href="/account" onClick={handleLinkClick} className="block">
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-[#0A0A0A]/20 dark:border-white/20 h-11"
+              >
+                <UserIcon size={16} />
+                my account
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="w-full rounded-full border-[#0A0A0A]/20 dark:border-white/20 h-11"
@@ -490,6 +499,14 @@ export function Navbar() {
                               {session.user.email}
                             </p>
                           </div>
+                          <Link
+                            href="/account"
+                            onClick={() => setAccountOpen(false)}
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-[#0A0A0A]/80 dark:text-white/80 hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors"
+                          >
+                            <UserIcon size={16} />
+                            my account
+                          </Link>
                           <Link
                             href="/wishlist"
                             onClick={() => setAccountOpen(false)}
