@@ -143,12 +143,12 @@ export function ProductGrid({
 
         {/* Left fade gradient overlay */}
         {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-2 w-12 sm:w-20 bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none z-10" />
+          <div className="absolute left-0 top-0 bottom-2 w-8 sm:w-12 bg-gradient-to-r from-white via-white/70 to-transparent dark:from-[#0A0A0A] dark:via-[#0A0A0A]/70 pointer-events-none z-10" />
         )}
 
         {/* Right fade gradient overlay */}
         {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-2 w-12 sm:w-20 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none z-10" />
+          <div className="absolute right-0 top-0 bottom-2 w-8 sm:w-12 bg-gradient-to-l from-white via-white/70 to-transparent dark:from-[#0A0A0A] dark:via-[#0A0A0A]/70 pointer-events-none z-10" />
         )}
       </div>
     </section>
