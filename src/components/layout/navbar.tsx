@@ -475,6 +475,20 @@ export function Navbar() {
                 )}
               </Link>
 
+              {/* Cart button */}
+              <button
+                className="p-2 rounded-full hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors relative"
+                aria-label="Cart"
+                onClick={toggleCart}
+              >
+                <ShoppingBagIcon size={18} className="text-[#0A0A0A] dark:text-white" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-0.5 -right-0.5 size-4 p-0 flex items-center justify-center bg-[#CCFF00] text-[#0A0A0A] text-[10px] font-bold border-0 rounded-full min-w-4">
+                    {cartCount}
+                  </Badge>
+                )}
+              </button>
+
               {/* Account button */}
               <div className="hidden lg:block relative">
                 <button
@@ -550,19 +564,6 @@ export function Navbar() {
                   </>
                 )}
               </div>
-
-              <button
-                className="p-2 rounded-full hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors relative"
-                aria-label="Cart"
-                onClick={toggleCart}
-              >
-                <ShoppingBagIcon size={18} className="text-[#0A0A0A] dark:text-white" />
-                {cartCount > 0 && (
-                  <Badge className="absolute -top-0.5 -right-0.5 size-4 p-0 flex items-center justify-center bg-[#CCFF00] text-[#0A0A0A] text-[10px] font-bold border-0 rounded-full min-w-4">
-                    {cartCount}
-                  </Badge>
-                )}
-              </button>
             </div>
           </div>
         </div>
