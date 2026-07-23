@@ -75,7 +75,10 @@ export default function CheckoutPage() {
     country: "India",
   });
 
-  // Pre-fill address from session
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
+
+  // Pre-fill address from session and fetch saved addresses
   useEffect(() => {
     if (session?.user) {
       setAddress((prev) => ({
@@ -83,6 +86,28 @@ export default function CheckoutPage() {
         name: session.user.name || prev.name,
         email: session.user.email || prev.email,
       }));
+
+      // Fetch saved addresses from DB
+      fetch("/api/account/addresses")
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setSavedAddresses(data);
+            const def = data.find((a: any) => a.isDefault) || data[0];
+            if (def) {
+              setSelectedAddressId(def.id);
+              setAddress((prev) => ({
+                ...prev,
+                phone: def.phone || prev.phone || "",
+                street: def.street || "",
+                city: def.city || "",
+                state: def.state || "",
+                postalCode: def.postalCode || "",
+              }));
+            }
+          }
+        })
+        .catch((err) => console.error("Failed to load saved addresses:", err));
     }
   }, [session]);
   const [addressErrors, setAddressErrors] = useState<Partial<Record<keyof AddressForm, string>>>({});
@@ -399,6 +424,79 @@ export default function CheckoutPage() {
                   shipping address
                 </h2>
 
+                {savedAddresses.length > 0 && (
+                  <div className="space-y-2 mb-4 pb-4 border-b border-border/40">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Select saved address
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {savedAddresses.map((addr) => {
+                        const isSelected = selectedAddressId === addr.id;
+                        return (
+                          <div
+                            key={addr.id}
+                            onClick={() => {
+                              setSelectedAddressId(addr.id);
+                              setAddress((prev) => ({
+                                ...prev,
+                                phone: addr.phone || prev.phone || "",
+                                street: addr.street || "",
+                                city: addr.city || "",
+                                state: addr.state || "",
+                                postalCode: addr.postalCode || "",
+                              }));
+                            }}
+                            className={`p-3 rounded-xl border-2 text-left cursor-pointer transition-all ${
+                              isSelected
+                                ? "border-[#CCFF00] bg-[#CCFF00]/5"
+                                : "border-border/60 hover:border-border bg-card"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-xs font-bold text-foreground capitalize">
+                                {addr.label || "Saved Address"}
+                              </span>
+                              {isSelected && (
+                                <span className="size-2 rounded-full bg-[#CCFF00]" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {addr.street}, {addr.city}, {addr.state} - {addr.postalCode}
+                            </p>
+                          </div>
+                        );
+                      })}
+
+                      {/* Add new address option */}
+                      <div
+                        onClick={() => {
+                          setSelectedAddressId("new");
+                          setAddress((prev) => ({
+                            ...prev,
+                            phone: "",
+                            street: "",
+                            city: "",
+                            state: "",
+                            postalCode: "",
+                          }));
+                        }}
+                        className={`p-3 rounded-xl border-2 text-left cursor-pointer transition-all flex flex-col justify-center ${
+                          selectedAddressId === "new"
+                            ? "border-[#CCFF00] bg-[#CCFF00]/5"
+                            : "border-border/60 hover:border-border bg-card"
+                        }`}
+                      >
+                        <p className="text-xs font-bold text-foreground">
+                          + Add new address
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          Enter details manually
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid sm:grid-cols-2 gap-4">
                   <AddressField
                     label="Full name"
@@ -484,6 +582,26 @@ export default function CheckoutPage() {
                           ...p,
                           postalCode: undefined,
                         }));
+
+                      // Auto-fetch city & state from Indian Post PIN code API if exactly 6 digits
+                      if (v.length === 6 && /^\d+$/.test(v)) {
+                        fetch(`https://api.postalpincode.in/pincode/${v}`)
+                          .then((r) => r.json())
+                          .then((data) => {
+                            if (data && data[0] && data[0].Status === "Success") {
+                              const info = data[0].PostOffice[0];
+                              if (info) {
+                                setAddress((prev) => ({
+                                  ...prev,
+                                  city: info.District || info.Taluk || prev.city,
+                                  state: info.State || prev.state,
+                                }));
+                                toast.success(`Location auto-detected: ${info.District}, ${info.State}`);
+                              }
+                            }
+                          })
+                          .catch((err) => console.error("Pin code fetch error:", err));
+                      }
                     }}
                   />
                   <AddressField
