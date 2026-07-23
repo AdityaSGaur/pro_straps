@@ -16,7 +16,6 @@ import {
   MailIcon,
   EyeIcon,
   GoogleIcon,
-  AppleIcon,
   PhoneIcon,
 } from "@/lib/icons";
 
@@ -119,24 +118,15 @@ export default function RegisterPage() {
 
         <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
           {/* Social Login */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="mb-6">
             <Button
               type="button"
               variant="outline"
-              className="rounded-full h-11 gap-2 font-medium text-sm"
-              onClick={() => toast.info("Google signup coming soon")}
+              className="w-full rounded-full h-11 gap-2 font-medium text-sm"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
             >
               <GoogleIcon size={18} />
-              Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full h-11 gap-2 font-medium text-sm"
-              onClick={() => toast.info("Apple signup coming soon")}
-            >
-              <AppleIcon size={18} />
-              Apple
+              Continue with Google
             </Button>
           </div>
 

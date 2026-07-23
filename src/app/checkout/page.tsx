@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Script from "next/script";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -88,12 +89,7 @@ export default function CheckoutPage() {
 
   // Payment
   const [paymentMethod, setPaymentMethod] = useState("card");
-  const [cardForm, setCardForm] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: "",
-  });
+  const [razorpayReady, setRazorpayReady] = useState(false);
 
   // Coupon
   const [couponCode, setCouponCode] = useState("");
@@ -130,12 +126,6 @@ export default function CheckoutPage() {
       if (!validateAddress()) return;
       setStep("payment");
     } else if (step === "payment") {
-      if (paymentMethod === "card") {
-        if (!cardForm.number || !cardForm.expiry || !cardForm.cvv || !cardForm.name) {
-          toast.error("Please fill in card details");
-          return;
-        }
-      }
       setStep("review");
     }
   }
@@ -170,7 +160,23 @@ export default function CheckoutPage() {
     setCouponLoading(false);
   }
 
-  async function placeOrder() {
+  // Shared order data builder
+  const buildOrderData = useCallback(() => ({
+    items,
+    shippingAddress: address,
+    paymentMethod,
+    couponCode: couponValid ? couponCode.toUpperCase() : undefined,
+    userId: (session?.user as { id?: string })?.id || null,
+    subtotal: cartSubtotal,
+    discount: couponDiscount,
+    tax,
+    shipping,
+    total,
+    couponId: undefined,
+  }), [items, address, paymentMethod, couponValid, couponCode, session, cartSubtotal, couponDiscount, tax, shipping, total]);
+
+  // COD order — uses the existing /api/orders endpoint
+  async function placeCodOrder() {
     setLoading(true);
     try {
       const res = await fetch("/api/orders", {
@@ -179,9 +185,9 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items,
           shippingAddress: address,
-          paymentMethod,
+          paymentMethod: "COD",
           couponCode: couponValid ? couponCode.toUpperCase() : undefined,
-          userId: session?.user?.id || null,
+          userId: (session?.user as { id?: string })?.id || null,
         }),
       });
       const data = await res.json();
@@ -198,6 +204,103 @@ export default function CheckoutPage() {
       toast.error("Something went wrong");
     }
     setLoading(false);
+  }
+
+  // Razorpay online payment flow
+  async function handleRazorpayPayment() {
+    if (!razorpayReady || typeof window === "undefined" || !(window as unknown as { Razorpay: unknown }).Razorpay) {
+      toast.error("Payment gateway is loading. Please try again.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 1. Create a Razorpay order on the server (amount is in paise)
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Math.round(total * 100),
+          currency: "INR",
+          receipt: `PS-${Date.now()}`,
+        }),
+      });
+      const orderData = await orderRes.json();
+
+      if (!orderRes.ok) {
+        toast.error(orderData.error || "Failed to create payment order");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Open Razorpay Checkout
+      const RazorpayClass = (window as unknown as { Razorpay: new (options: Record<string, unknown>) => { open: () => void } }).Razorpay;
+      const rzp = new RazorpayClass({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Pro Straps",
+        description: "Watch strap purchase",
+        order_id: orderData.order_id,
+        prefill: {
+          name: address.name,
+          email: address.email,
+          contact: address.phone,
+        },
+        theme: {
+          color: "#C8FF00",
+        },
+        handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
+          // 3. Verify payment and create order
+          try {
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderData: buildOrderData(),
+              }),
+            });
+            const verifyData = await verifyRes.json();
+
+            if (verifyRes.ok) {
+              clearCart();
+              toast.success("Payment successful! Order confirmed.");
+              router.push(
+                `/order-confirmation?orderNumber=${verifyData.orderNumber}&total=${total}`
+              );
+            } else {
+              toast.error(verifyData.error || "Payment verification failed");
+            }
+          } catch {
+            toast.error("Payment verification failed. Contact support.");
+          }
+          setLoading(false);
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+            toast.info("Payment cancelled");
+          },
+        },
+      });
+
+      rzp.open();
+    } catch {
+      toast.error("Something went wrong starting payment");
+      setLoading(false);
+    }
+  }
+
+  // Dispatch to correct payment handler
+  async function placeOrder() {
+    if (paymentMethod === "cod") {
+      await placeCodOrder();
+    } else {
+      await handleRazorpayPayment();
+    }
   }
 
   if (items.length === 0) {
@@ -223,6 +326,10 @@ export default function CheckoutPage() {
 
   return (
     <div className="px-4 py-8 lg:py-12">
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        onLoad={() => setRazorpayReady(true)}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <h1 className="heading text-2xl sm:text-3xl font-bold text-foreground mb-8">
@@ -458,66 +565,6 @@ export default function CheckoutPage() {
                     </div>
                   </label>
                 </RadioGroup>
-
-                {/* Card Form */}
-                {paymentMethod === "card" && (
-                  <div className="space-y-4 pt-2">
-                    <AddressField
-                      label="Card number"
-                      id="card-number"
-                      placeholder="1234 5678 9012 3456"
-                      value={cardForm.number}
-                      onChange={(v) =>
-                        setCardForm((p) => ({ ...p, number: v }))
-                      }
-                    />
-                    <div className="grid grid-cols-3 gap-4">
-                      <AddressField
-                        label="Expiry"
-                        id="card-expiry"
-                        placeholder="MM/YY"
-                        value={cardForm.expiry}
-                        onChange={(v) =>
-                          setCardForm((p) => ({ ...p, expiry: v }))
-                        }
-                      />
-                      <AddressField
-                        label="CVV"
-                        id="card-cvv"
-                        placeholder="123"
-                        type="password"
-                        value={cardForm.cvv}
-                        onChange={(v) =>
-                          setCardForm((p) => ({ ...p, cvv: v }))
-                        }
-                      />
-                      <AddressField
-                        label="Name on card"
-                        id="card-name"
-                        placeholder="John Doe"
-                        value={cardForm.name}
-                        onChange={(v) =>
-                          setCardForm((p) => ({ ...p, name: v }))
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* UPI ID */}
-                {paymentMethod === "upi" && (
-                  <div className="pt-2">
-                    <AddressField
-                      label="UPI ID"
-                      id="upi-id"
-                      placeholder="yourname@upi"
-                      value={cardForm.number}
-                      onChange={(v) =>
-                        setCardForm((p) => ({ ...p, number: v }))
-                      }
-                    />
-                  </div>
-                )}
               </div>
             )}
 
