@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { readDb, createUserInFile } from "@/lib/file-db";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -31,10 +31,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await db.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
-    });
+    // Check if user already exists in file DB
+    const dbData = readDb();
+    const existingUser = dbData.users.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase().trim()
+    );
 
     if (existingUser) {
       return NextResponse.json(
@@ -46,16 +47,14 @@ export async function POST(request: Request) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12);
 
-    // Create user
-    const user = await db.user.create({
-      data: {
-        name: name?.trim() || null,
-        email: email.toLowerCase().trim(),
-        phone: phone?.trim() || null,
-        passwordHash,
-        role: "CUSTOMER",
-        isActive: true,
-      },
+    // Create user in file DB
+    const user = createUserInFile({
+      name: name?.trim() || null,
+      email: email.toLowerCase().trim(),
+      phone: phone?.trim() || null,
+      passwordHash,
+      role: "CUSTOMER",
+      isActive: true,
     });
 
     return NextResponse.json(

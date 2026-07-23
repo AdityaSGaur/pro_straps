@@ -1,16 +1,15 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "@/lib/db";
+import { readDb, getOrCreateUser } from "@/lib/file-db";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db) as NextAuthOptions["adapter"],
+  // Bypassing PrismaAdapter for local file DB JWT operations
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "mock-client-id",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock-client-secret",
       allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
@@ -24,9 +23,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await db.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
-        });
+        const dbData = readDb();
+        const user = dbData.users.find(
+          (u) => u.email.toLowerCase() === credentials.email.toLowerCase().trim()
+        );
 
         if (!user || !user.passwordHash) {
           return null;
@@ -50,25 +50,23 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          image: user.avatar,
+          image: null,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email) {
+        // Sync google sign-ins into local file db
+        getOrCreateUser(user.email, user.name);
+      }
+      return true;
+    },
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // For OAuth users, fetch role from DB
-        if (account?.provider !== "credentials") {
-          const dbUser = await db.user.findUnique({
-            where: { id: user.id },
-            select: { role: true },
-          });
-          token.role = dbUser?.role ?? "CUSTOMER";
-        } else {
-          token.role = (user as { role: string }).role;
-        }
+        token.role = (user as { role: string }).role || "CUSTOMER";
       }
       return token;
     },
@@ -88,5 +86,5 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "any-random-string-for-local-development",
 };

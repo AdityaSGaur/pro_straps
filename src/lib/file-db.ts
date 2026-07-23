@@ -3,15 +3,18 @@ import path from "path";
 
 const DB_FILE = path.join(process.cwd(), "src", "data", "db.json");
 
-interface MockUser {
+export interface MockUser {
   id: string;
   name: string | null;
   email: string;
   phone: string | null;
+  passwordHash?: string;
+  role: string;
+  isActive: boolean;
   createdAt: string;
 }
 
-interface MockAddress {
+export interface MockAddress {
   id: string;
   userId: string;
   label: string | null;
@@ -26,7 +29,7 @@ interface MockAddress {
   createdAt: string;
 }
 
-interface MockOrder {
+export interface MockOrder {
   id: string;
   orderNumber: string;
   status: string;
@@ -38,7 +41,7 @@ interface MockOrder {
   items: any[];
 }
 
-interface FileDB {
+export interface FileDB {
   users: MockUser[];
   addresses: MockAddress[];
   orders: MockOrder[];
@@ -91,12 +94,26 @@ export function getOrCreateUser(email: string, name?: string | null): MockUser {
       name: name || null,
       email: cleanEmail,
       phone: null,
+      role: "CUSTOMER",
+      isActive: true,
       createdAt: new Date().toISOString(),
     };
     db.users.push(user);
     writeDb(db);
   }
   return user;
+}
+
+export function createUserInFile(userData: Omit<MockUser, "id" | "createdAt">): MockUser {
+  const db = readDb();
+  const newUser: MockUser = {
+    ...userData,
+    id: `usr_${Math.random().toString(36).substr(2, 9)}`,
+    createdAt: new Date().toISOString(),
+  };
+  db.users.push(newUser);
+  writeDb(db);
+  return newUser;
 }
 
 export function updateUser(id: string, name?: string | null, phone?: string | null): MockUser | null {
