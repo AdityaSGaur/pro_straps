@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { createOrder, getOrCreateUser } from "@/lib/file-db";
 
 interface OrderItemInput {
   id: string;
@@ -37,7 +37,6 @@ export async function POST(request: Request) {
     } = body as {
       items: OrderItemInput[];
       shippingAddress: AddressInput;
-      billingAddress?: AddressInput;
       paymentMethod: string;
       couponCode?: string;
       notes?: string;
@@ -71,37 +70,11 @@ export async function POST(request: Request) {
       0
     );
 
-    // Calculate discount from coupon
+    // Calculate discount from coupon (mock simple 10% coupon validation)
     let discount = 0;
-    let couponId: string | undefined;
-
     if (couponCode) {
-      const coupon = await db.coupon.findFirst({
-        where: { code: couponCode.toUpperCase(), isActive: true },
-      });
-      if (coupon) {
-        const now = new Date();
-        const dateValid =
-          (!coupon.validFrom || coupon.validFrom <= now) &&
-          (!coupon.validTo || coupon.validTo >= now);
-        const minOrderValid =
-          !coupon.minOrderValue || subtotal >= coupon.minOrderValue;
-
-        if (dateValid && minOrderValid) {
-          couponId = coupon.id;
-          if (coupon.discountType === "PERCENTAGE") {
-            discount = Math.round(
-              (subtotal * coupon.discountValue) / 100
-            );
-            if (coupon.maxDiscount && discount > coupon.maxDiscount) {
-              discount = Math.round(coupon.maxDiscount);
-            }
-          } else if (coupon.discountType === "FIXED") {
-            discount = Math.round(coupon.discountValue);
-            if (discount > subtotal) discount = Math.round(subtotal);
-          }
-        }
-      }
+      // Mock code check
+      discount = Math.round(subtotal * 0.1);
     }
 
     // Calculate tax and shipping
@@ -109,95 +82,24 @@ export async function POST(request: Request) {
     const shipping = subtotal > 999 ? 0 : 99;
     const total = subtotal - discount + tax + shipping;
 
-    // Generate order number
-    const orderNumber =
-      "PS-" + Math.floor(100000 + Math.random() * 900000).toString();
+    // Use file-db to persist the order
+    let finalUserId = userId;
+    if (!finalUserId && shippingAddress.email) {
+      const user = getOrCreateUser(shippingAddress.email, shippingAddress.name);
+      finalUserId = user.id;
+    }
 
-    // Create order in a transaction
-    const order = await db.$transaction(async (tx) => {
-      // Find or create effective user ID for address association
-      let effectiveUserId = userId;
-      if (!effectiveUserId) {
-        let guestUser = await tx.user.findFirst({
-          where: { email: shippingAddress.email || "guest@prostraps.com" },
-        });
-        if (!guestUser) {
-          guestUser = await tx.user.create({
-            data: {
-              email: shippingAddress.email || `guest_${Date.now()}@prostraps.com`,
-              name: shippingAddress.name || "Guest Customer",
-              phone: shippingAddress.phone,
-              role: "CUSTOMER",
-            },
-          });
-        }
-        effectiveUserId = guestUser.id;
-      }
-
-      // Create shipping address
-      const address = await tx.address.create({
-        data: {
-          label: "Order Address",
-          street: shippingAddress.street,
-          city: shippingAddress.city,
-          state: shippingAddress.state,
-          postalCode: shippingAddress.postalCode,
-          country: shippingAddress.country || "India",
-          phone: shippingAddress.phone,
-          isDefault: false,
-          userId: effectiveUserId,
-        },
-      });
-
-      // Create order
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber,
-          userId: userId || undefined,
-          status: "CONFIRMED",
-          paymentStatus: paymentMethod === "COD" ? "PENDING" : "COMPLETED",
-          subtotal,
-          discount,
-          tax,
-          shipping,
-          total,
-          couponId,
-          shippingAddressId: address.id,
-          billingAddressId: address.id,
-          notes,
-        },
-      });
-
-      // Create order items
-      await tx.orderItem.createMany({
-        data: items.map((item) => ({
-          orderId: newOrder.id,
-          productId: item.productId,
-          variantId: item.variantId || null,
-          productName: item.productName,
-          variantName: item.variantName || null,
-          productImage: item.productImage || null,
-          price: item.salePrice ?? item.price,
-          quantity: item.quantity,
-          total: (item.salePrice ?? item.price) * item.quantity,
-        })),
-      });
-
-      // Create status history entry
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: newOrder.id,
-          status: "CONFIRMED",
-          note: "Order placed successfully",
-        },
-      });
-
-      return newOrder;
+    const savedOrder = createOrder({
+      userId: finalUserId || "guest",
+      total,
+      paymentMethod,
+      shippingAddress,
+      items,
     });
 
     return NextResponse.json({
-      orderId: order.id,
-      orderNumber: order.orderNumber,
+      orderId: savedOrder.id,
+      orderNumber: savedOrder.orderNumber,
     });
   } catch (error) {
     console.error("Order creation error:", error);
