@@ -4,6 +4,12 @@ import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
+import { Sniglet } from "next/font/google";
+
+const sniglet = Sniglet({
+  weight: ["400", "800"],
+  subsets: ["latin"],
+});
 import {
   SearchIcon,
   HeartIcon,
@@ -308,7 +314,7 @@ function MobileQuickAction({ icon, label, count, onClick, href, onClose }: {
               />
             </div>
           ) : (
-            <div className="size-8 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-base font-bold border border-border leading-none font-sans">
+            <div className={cn("size-8 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-base font-bold border border-border leading-none", sniglet.className)}>
               {(session.user.name || session.user.email || "u")[0].toLowerCase()}
             </div>
           )
@@ -530,7 +536,7 @@ export function Navbar() {
                         />
                       </div>
                     ) : (
-                      <div className="size-9 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-lg font-bold border border-border leading-none font-sans lowercase">
+                      <div className={cn("size-9 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-lg font-bold border border-border leading-none", sniglet.className)}>
                         {(session.user.name || session.user.email || "u")[0].toLowerCase()}
                       </div>
                     )
