@@ -121,7 +121,7 @@ export function ProductGrid({
         </motion.div>
       )}
       {/* Horizontal scroll carousel */}
-      <div className="relative">
+      <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div
           ref={scrollRef}
           className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
@@ -139,6 +139,26 @@ export function ProductGrid({
             </motion.div>
           ))}
         </div>
+
+        {/* Left fade gradient overlay */}
+        {canScrollLeft && (
+          <div 
+            className="absolute left-0 top-0 bottom-2 w-12 sm:w-20 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to right, var(--background) 0%, transparent 100%)'
+            }}
+          />
+        )}
+
+        {/* Right fade gradient overlay */}
+        {canScrollRight && (
+          <div 
+            className="absolute right-0 top-0 bottom-2 w-12 sm:w-20 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to left, var(--background) 0%, transparent 100%)'
+            }}
+          />
+        )}
       </div>
     </section>
   )
