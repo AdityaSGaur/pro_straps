@@ -139,57 +139,57 @@ export default function AccountOverviewPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         {/* Orders Card */}
         <Link href="/account/orders" className="block relative overflow-hidden group">
-          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
+          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] dark:hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
             {/* Concentric rings vector background (fades/scales in on hover) */}
             <div className="absolute -top-8 -left-8 size-28 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-16 -left-16 size-44 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-24 -left-24 size-60 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
 
             <div className="flex justify-between items-start relative z-10">
-              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
+              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] dark:group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] dark:group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
                 <PackageIcon size={20} />
               </div>
-              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 dark:group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
                 orders <ArrowRightIcon size={12} className="group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
 
             <div className="mt-4 relative z-10">
-              <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] tracking-tight transition-colors">{recentOrders.length}</p>
-              <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">total purchases</p>
+              <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] dark:group-hover:text-[#0A0A0A] tracking-tight transition-colors">{recentOrders.length}</p>
+              <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 dark:group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">total purchases</p>
             </div>
           </div>
         </Link>
 
         {/* Wishlist Card */}
         <Link href="/wishlist" className="block relative overflow-hidden group">
-          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
+          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] dark:hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
             {/* Concentric rings vector background */}
             <div className="absolute -top-8 -left-8 size-28 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-16 -left-16 size-44 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-24 -left-24 size-60 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
 
             <div className="flex justify-between items-start relative z-10">
-              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
+              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] dark:group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] dark:group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
                 <HeartIcon size={20} />
               </div>
-              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 dark:group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
                 wishlist <ArrowRightIcon size={12} className="group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
 
             <div className="flex justify-between items-end mt-4 relative z-10">
               <div>
-                <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] tracking-tight transition-colors">{wishlistItems.length}</p>
-                <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">saved items</p>
+                <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] dark:group-hover:text-[#0A0A0A] tracking-tight transition-colors">{wishlistItems.length}</p>
+                <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 dark:group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">saved items</p>
               </div>
 
               {/* Mock Bar chart */}
               <div className="flex items-end gap-1 h-8 opacity-60">
-                <div className="w-1.5 h-3 bg-muted-foreground/20 group-hover:bg-[#0A0A0A]/20 rounded-full transition-colors" />
-                <div className="w-1.5 h-5 bg-muted-foreground/20 group-hover:bg-[#0A0A0A]/20 rounded-full transition-colors" />
-                <div className="w-1.5 h-4 bg-[#CCFF00] group-hover:bg-[#0A0A0A] rounded-full transition-colors" />
-                <div className="w-1.5 h-7 bg-[#CCFF00] group-hover:bg-[#0A0A0A] rounded-full transition-colors" />
+                <div className="w-1.5 h-3 bg-muted-foreground/20 group-hover:bg-[#0A0A0A]/20 dark:group-hover:bg-[#0A0A0A]/20 rounded-full transition-colors" />
+                <div className="w-1.5 h-5 bg-muted-foreground/20 group-hover:bg-[#0A0A0A]/20 dark:group-hover:bg-[#0A0A0A]/20 rounded-full transition-colors" />
+                <div className="w-1.5 h-4 bg-[#CCFF00] group-hover:bg-[#0A0A0A] dark:group-hover:bg-[#0A0A0A] rounded-full transition-colors" />
+                <div className="w-1.5 h-7 bg-[#CCFF00] group-hover:bg-[#0A0A0A] dark:group-hover:bg-[#0A0A0A] rounded-full transition-colors" />
               </div>
             </div>
           </div>
@@ -197,29 +197,29 @@ export default function AccountOverviewPage() {
 
         {/* Address Card */}
         <Link href="/account/addresses" className="block relative overflow-hidden group">
-          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
+          <div className="rounded-3xl border border-border/50 bg-[#FFFFFF] dark:bg-[#141414] hover:bg-[#CCFF00] dark:hover:bg-[#CCFF00] p-6 hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] transition-all duration-300 min-h-[140px] flex flex-col justify-between relative overflow-hidden z-10">
             {/* Concentric rings vector background */}
             <div className="absolute -top-8 -left-8 size-28 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-16 -left-16 size-44 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             <div className="absolute -top-24 -left-24 size-60 rounded-full border border-[#0A0A0A]/5 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
 
             <div className="flex justify-between items-start relative z-10">
-              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
+              <div className="size-11 rounded-2xl bg-[#CCFF00]/10 group-hover:bg-[#0A0A0A] dark:group-hover:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#CCFF00] group-hover:text-[#CCFF00] dark:group-hover:text-[#CCFF00] flex items-center justify-center transition-colors duration-300">
                 <LocationIcon size={20} />
               </div>
-              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-[#0A0A0A]/60 dark:group-hover:text-[#0A0A0A]/60 flex items-center gap-1 transition-colors">
                 addresses <ArrowRightIcon size={12} className="group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
 
             <div className="flex justify-between items-end mt-4 relative z-10">
               <div>
-                <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] tracking-tight transition-colors">{defaultAddress ? "1" : "0"}</p>
-                <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">saved locations</p>
+                <p className="text-3xl font-extrabold text-foreground group-hover:text-[#0A0A0A] dark:group-hover:text-[#0A0A0A] tracking-tight transition-colors">{defaultAddress ? "1" : "0"}</p>
+                <p className="text-[11px] font-medium text-muted-foreground group-hover:text-[#0A0A0A]/70 dark:group-hover:text-[#0A0A0A]/70 uppercase tracking-wider mt-1 transition-colors">saved locations</p>
               </div>
 
               {/* Mock Sparkline chart */}
-              <div className="opacity-60 flex items-end h-8 text-[#CCFF00] group-hover:text-[#0A0A0A] transition-colors">
+              <div className="opacity-60 flex items-end h-8 text-[#CCFF00] group-hover:text-[#0A0A0A] dark:group-hover:text-[#0A0A0A] transition-colors">
                 <svg className="w-16 h-8" viewBox="0 0 100 50">
                   <path
                     d="M0,45 Q25,15 50,35 T100,15"
