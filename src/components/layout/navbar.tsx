@@ -480,7 +480,7 @@ export function Navbar() {
             </nav>
 
             {/* ---- Right icons ---- */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <ThemeToggle className="hidden sm:flex" />
               <button
                 className="hidden sm:flex p-2 rounded-full hover:bg-[#F5F5F7] dark:hover:bg-white/5 transition-colors"
@@ -518,7 +518,7 @@ export function Navbar() {
               </button>
 
               {/* Account button */}
-              <div className="hidden lg:block relative">
+              <div className="hidden lg:block relative ml-1.5">
                  <button
                   className="flex items-center justify-center rounded-full hover:opacity-85 transition-opacity"
                   aria-label="Account"
