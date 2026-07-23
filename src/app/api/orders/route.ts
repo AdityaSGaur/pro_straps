@@ -126,7 +126,7 @@ export async function POST(request: Request) {
           country: shippingAddress.country || "India",
           phone: shippingAddress.phone,
           isDefault: false,
-          userId: userId || undefined,
+          ...(userId ? { userId } : {}),
         },
       });
 

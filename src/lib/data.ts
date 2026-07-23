@@ -6,8 +6,8 @@ import { cache } from "react";
 
 export type ProductWithDetails = Prisma.ProductGetPayload<{
   include: {
-    images: { select: { id: true; url: true; alt: true; isPrimary: true; sortOrder: true }; orderBy: { sortOrder: "asc" } };
-    variants: { where: { isActive: true }; select: { id: true; sku: true; color: true; colorName: true; width: true; price: true; salePrice: true; stock: true; isActive: true }; orderBy: { price: "asc" } };
+    images: { orderBy: { sortOrder: "asc" } };
+    variants: { where: { isActive: true }; orderBy: { price: "asc" } };
     categories: { select: { categoryId: true; category: { select: { id: true; name: true; slug: true } } } };
     collections: { select: { collectionId: true; collection: { select: { id: true; name: true; slug: true } } } };
   };
@@ -23,12 +23,10 @@ export type ProductWithReviews = ProductWithDetails & {
 
 const productInclude = {
   images: {
-    select: { id: true, url: true, alt: true, isPrimary: true, sortOrder: true },
     orderBy: { sortOrder: "asc" as const },
   },
   variants: {
     where: { isActive: true },
-    select: { id: true, sku: true, color: true, colorName: true, width: true, price: true, salePrice: true, stock: true, isActive: true },
     orderBy: { price: "asc" as const },
   },
   categories: {

@@ -26,9 +26,9 @@ import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { label: "Shop", href: "/shop", hasDropdown: true },
-  { label: "Collections", href: "/collections" },
-  { label: "Customizer", href: "/customizer" },
-  { label: "About", href: "/about" },
+  { label: "Collections", href: "/collections", hasDropdown: false },
+  { label: "Customizer", href: "/customizer", hasDropdown: false },
+  { label: "About", href: "/about", hasDropdown: false },
 ] as const;
 
 const SHOP_CATEGORIES = [
