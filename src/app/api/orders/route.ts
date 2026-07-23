@@ -115,6 +115,25 @@ export async function POST(request: Request) {
 
     // Create order in a transaction
     const order = await db.$transaction(async (tx) => {
+      // Find or create effective user ID for address association
+      let effectiveUserId = userId;
+      if (!effectiveUserId) {
+        let guestUser = await tx.user.findFirst({
+          where: { email: shippingAddress.email || "guest@prostraps.com" },
+        });
+        if (!guestUser) {
+          guestUser = await tx.user.create({
+            data: {
+              email: shippingAddress.email || `guest_${Date.now()}@prostraps.com`,
+              name: shippingAddress.name || "Guest Customer",
+              phone: shippingAddress.phone,
+              role: "CUSTOMER",
+            },
+          });
+        }
+        effectiveUserId = guestUser.id;
+      }
+
       // Create shipping address
       const address = await tx.address.create({
         data: {
@@ -126,7 +145,7 @@ export async function POST(request: Request) {
           country: shippingAddress.country || "India",
           phone: shippingAddress.phone,
           isDefault: false,
-          ...(userId ? { userId } : {}),
+          userId: effectiveUserId,
         },
       });
 
