@@ -7,7 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Sniglet } from "next/font/google";
+import { cn } from "@/lib/utils";
 import { UserIcon, MailIcon, PhoneIcon, CalendarIcon, EditIcon, CheckIcon, CloseIcon } from "@/lib/icons";
+
+const sniglet = Sniglet({
+  weight: ["400", "800"],
+  subsets: ["latin"],
+});
 
 type Profile = { id: string; name: string | null; email: string; phone: string | null; avatar: string | null; createdAt: string };
 
@@ -87,9 +94,9 @@ export default function ProfilePage() {
       <div className="max-w-lg">
         {/* Avatar & name */}
         <div className="flex items-center gap-4 mb-8">
-          <div className="size-16 sm:size-20 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <span className="text-2xl sm:text-3xl font-bold text-muted-foreground">
-              {displayName.charAt(0).toUpperCase()}
+          <div className="size-16 sm:size-20 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center shrink-0 border border-border">
+            <span className={cn("text-2xl sm:text-3xl font-normal leading-none lowercase", sniglet.className)}>
+              {displayName.charAt(0).toLowerCase()}
             </span>
           </div>
           <div className="min-w-0">
