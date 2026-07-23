@@ -314,7 +314,7 @@ function MobileQuickAction({ icon, label, count, onClick, href, onClose }: {
               />
             </div>
           ) : (
-            <div className={cn("size-8 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-base font-bold border border-border leading-none", sniglet.className)}>
+            <div className={cn("size-8 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-base font-normal border border-border leading-none", sniglet.className)}>
               {(session.user.name || session.user.email || "u")[0].toLowerCase()}
             </div>
           )
@@ -536,7 +536,7 @@ export function Navbar() {
                         />
                       </div>
                     ) : (
-                      <div className={cn("size-9 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-lg font-bold border border-border leading-none", sniglet.className)}>
+                      <div className={cn("size-9 rounded-full bg-[#CCFF00] text-[#0A0A0A] flex items-center justify-center text-lg font-normal border border-border leading-none", sniglet.className)}>
                         {(session.user.name || session.user.email || "u")[0].toLowerCase()}
                       </div>
                     )
