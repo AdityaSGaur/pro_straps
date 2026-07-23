@@ -1,14 +1,15 @@
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { cache } from "react";
 
 // ─── Types ─────────────────────────────────────────────────────────────
 
 export type ProductWithDetails = Prisma.ProductGetPayload<{
   include: {
-    images: { orderBy: { sortOrder: "asc" } };
-    variants: { where: { isActive: true }, orderBy: { price: "asc" } };
-    categories: { include: { category: true } };
-    collections: { include: { collection: true } };
+    images: { select: { id: true; url: true; alt: true; isPrimary: true; sortOrder: true }; orderBy: { sortOrder: "asc" } };
+    variants: { where: { isActive: true }; select: { id: true; sku: true; color: true; colorName: true; width: true; price: true; salePrice: true; stock: true; isActive: true }; orderBy: { price: "asc" } };
+    categories: { select: { categoryId: true; category: { select: { id: true; name: true; slug: true } } } };
+    collections: { select: { collectionId: true; collection: { select: { id: true; name: true; slug: true } } } };
   };
 }>;
 
@@ -21,15 +22,26 @@ export type ProductWithReviews = ProductWithDetails & {
 // ─── Shared include payload for product queries ────────────────────────
 
 const productInclude = {
-  images: { orderBy: { sortOrder: "asc" as const } },
-  variants: { where: { isActive: true }, orderBy: { price: "asc" as const } },
-  categories: { include: { category: true } },
-  collections: { include: { collection: true } },
+  images: {
+    select: { id: true, url: true, alt: true, isPrimary: true, sortOrder: true },
+    orderBy: { sortOrder: "asc" as const },
+  },
+  variants: {
+    where: { isActive: true },
+    select: { id: true, sku: true, color: true, colorName: true, width: true, price: true, salePrice: true, stock: true, isActive: true },
+    orderBy: { price: "asc" as const },
+  },
+  categories: {
+    select: { categoryId: true, category: { select: { id: true, name: true, slug: true } } },
+  },
+  collections: {
+    select: { collectionId: true, collection: { select: { id: true, name: true, slug: true } } },
+  },
 } satisfies Prisma.ProductInclude;
 
 // ─── Get all active products with filtering, sorting, pagination ────────
 
-export async function getProducts(params?: {
+export const getProducts = cache(async function getProducts(params?: {
   category?: string;
   collection?: string;
   sort?: string;
@@ -187,7 +199,7 @@ export async function getProducts(params?: {
 
 // ─── Get a single product by slug with reviews and avg rating ──────────
 
-export async function getProductBySlug(
+export const getProductBySlug = cache(async function getProductBySlug(
   slug: string
 ): Promise<ProductWithReviews | null> {
   const product = await db.product.findUnique({
@@ -226,11 +238,11 @@ export async function getProductBySlug(
     _avgRating: aggregate._avg.rating ?? undefined,
     _reviewCount: aggregate._count.rating,
   } as ProductWithReviews;
-}
+});
 
 // ─── Get featured products (max 8) ────────────────────────────────────
 
-export async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
+export const getFeaturedProducts = cache(async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
   return db.product.findMany({
     where: {
       status: "ACTIVE",
@@ -240,11 +252,11 @@ export async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
     orderBy: { createdAt: "desc" },
     take: 8,
   }) as Promise<ProductWithDetails[]>;
-}
+});
 
 // ─── Get bestseller products (max 8) ──────────────────────────────────
 
-export async function getBestsellerProducts(): Promise<ProductWithDetails[]> {
+export const getBestsellerProducts = cache(async function getBestsellerProducts(): Promise<ProductWithDetails[]> {
   return db.product.findMany({
     where: {
       status: "ACTIVE",
@@ -254,11 +266,11 @@ export async function getBestsellerProducts(): Promise<ProductWithDetails[]> {
     orderBy: { createdAt: "desc" },
     take: 8,
   }) as Promise<ProductWithDetails[]>;
-}
+});
 
 // ─── Get new arrival products (max 8) ─────────────────────────────────
 
-export async function getNewArrivals(): Promise<ProductWithDetails[]> {
+export const getNewArrivals = cache(async function getNewArrivals(): Promise<ProductWithDetails[]> {
   return db.product.findMany({
     where: {
       status: "ACTIVE",
@@ -268,11 +280,11 @@ export async function getNewArrivals(): Promise<ProductWithDetails[]> {
     orderBy: { createdAt: "desc" },
     take: 8,
   }) as Promise<ProductWithDetails[]>;
-}
+});
 
 // ─── Get all categories ───────────────────────────────────────────────
 
-export async function getCategories(): Promise<{
+export const getCategories = cache(async function getCategories(): Promise<{
   id: string;
   name: string;
   slug: string;
@@ -288,11 +300,11 @@ export async function getCategories(): Promise<{
     },
     orderBy: { sortOrder: "asc" },
   });
-}
+});
 
 // ─── Get all collections ──────────────────────────────────────────────
 
-export async function getCollections(): Promise<{
+export const getCollections = cache(async function getCollections(): Promise<{
   id: string;
   name: string;
   slug: string;
@@ -308,7 +320,7 @@ export async function getCollections(): Promise<{
     },
     orderBy: { sortOrder: "asc" },
   });
-}
+});
 
 // ─── Get watch brands ─────────────────────────────────────────────────
 
