@@ -139,10 +139,12 @@ export function CartDrawer() {
               <p className="text-xs text-muted-foreground">
                 shipping & taxes calculated at checkout
               </p>
-              <Button className="w-full rounded-full bg-lime text-black hover:bg-lime-dark font-semibold h-12 text-sm uppercase tracking-wider">
-                proceed to checkout
-                <ArrowRightIcon size={16} className="ml-2" />
-              </Button>
+              <Link href="/checkout" onClick={() => setCartOpen(false)} className="block">
+                <Button className="w-full rounded-full bg-lime text-black hover:bg-lime-dark font-semibold h-12 text-sm uppercase tracking-wider">
+                  proceed to checkout
+                  <ArrowRightIcon size={16} className="ml-2" />
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 className="w-full rounded-full text-sm"
